@@ -181,6 +181,9 @@ namespace Microsoft.Graphics.Canvas.UI.Xaml
         [propget] HRESULT ForceSoftwareRenderer([out, retval] boolean* value);
         [propput] HRESULT ForceSoftwareRenderer([in] boolean value);
 
+        [propget] HRESULT DisableLoadedOptimization([out, retval] boolean* value);
+        [propput] HRESULT DisableLoadedOptimization([in] boolean value);
+
         //
         // Allows an app to explicitly set a device of its own choosing to the
         // control. 

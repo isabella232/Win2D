@@ -273,6 +273,9 @@ namespace Microsoft.Graphics.Canvas.UI.Xaml
         [propget] HRESULT ForceSoftwareRenderer([out, retval] boolean* value);
         [propput] HRESULT ForceSoftwareRenderer([in] boolean value);
 
+        [propget] HRESULT DisableLoadedOptimization([out, retval] boolean* value);
+        [propput] HRESULT DisableLoadedOptimization([in] boolean value);
+
         [propget] HRESULT CustomDevice([out, retval] Microsoft.Graphics.Canvas.CanvasDevice** value);
         [propput] HRESULT CustomDevice([in] Microsoft.Graphics.Canvas.CanvasDevice* value);
 

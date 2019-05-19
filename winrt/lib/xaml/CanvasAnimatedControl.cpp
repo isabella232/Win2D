@@ -156,6 +156,7 @@ CanvasAnimatedControl::CanvasAnimatedControl(std::shared_ptr<ICanvasAnimatedCont
 
 CanvasAnimatedControl::~CanvasAnimatedControl()
 {
+    ForceUnloadIfNeeded();
     // These should all have been canceled on unload
     assert(m_sharedState.PendingAsyncActions.empty());
 }

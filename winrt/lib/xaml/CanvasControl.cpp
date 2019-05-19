@@ -148,6 +148,10 @@ CanvasControl::CanvasControl(
 {
 }
 
+CanvasControl::~CanvasControl() {
+    ForceUnloadIfNeeded();
+}
+
 void CanvasControl::RegisterEventHandlers()
 {
     ImageControlMixIn::RegisterEventHandlers<CanvasControl>(GetAdapter().get());

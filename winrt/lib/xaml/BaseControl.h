@@ -95,6 +95,20 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
             Size Size;
         };
 
+        void ForceUnloadIfNeeded() {
+            auto lock = GetLock();
+            if (!m_disableLoadedOptimization) {
+                return;
+            }
+            m_loadedCount = 0;
+            m_isLoaded = false;
+            lock.unlock();
+
+            Unloaded();
+
+            UnregisterEventHandlers();
+        }
+
     private:
         // The current window is thread local.  We grab this on construction
         // since this will happen on the correct thread.  From then on we use
@@ -110,6 +124,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
         bool m_isVisible;
         bool m_useSharedDevice;
         bool m_forceSoftwareRenderer;
+        bool m_disableLoadedOptimization;
 
         RegisteredEvent m_applicationSuspendingEventRegistration;
         RegisteredEvent m_applicationResumingEventRegistration;
@@ -142,6 +157,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
             , m_customDpiScaling(1.0f)
             , m_useSharedDevice(useSharedDevice)
             , m_forceSoftwareRenderer(false)
+            , m_disableLoadedOptimization(false)
             , m_currentSize{}
             , m_clearColor{}
             , m_currentRenderTarget{}
@@ -292,6 +308,31 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
                     
                     Changed(ChangeReason::DeviceCreationOptions);
                 });
+        }
+
+        IFACEMETHODIMP get_DisableLoadedOptimization(
+            boolean* value) override
+        {
+            return ExceptionBoundary(
+                [&]
+            {
+                CheckInPointer(value);
+
+                auto lock = GetLock();
+
+                *value = m_disableLoadedOptimization;
+            });
+        }
+
+        IFACEMETHODIMP put_DisableLoadedOptimization(
+            boolean value) override
+        {
+            return ExceptionBoundary(
+                [&]
+            {
+                auto lock = GetLock();
+                m_disableLoadedOptimization = !!value;
+            });
         }
 
         IFACEMETHODIMP get_CustomDevice(
@@ -825,15 +866,24 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
             return ExceptionBoundary(
                 [&]
                 {
-                    if (--m_loadedCount == 0)
-                    {
-                        auto lock = GetLock();
-                        m_isLoaded = false;
-                        lock.unlock();
-
-                        Unloaded();
-                        UnregisterEventHandlers();
+                    // Given that OnUnloaded is called more often than loaded,
+                    // when loading and unloading the control repeatedly very fast,
+                    // the drawing stops working.
+                    // https://github.com/microsoft/Win2D/issues/700
+                    // To work around this issue, we're not using OnUnloaded
+                    // to unregister from drawing. Instead, using unregistering in the destructor.
+                    auto lock = GetLock();
+                    if (m_disableLoadedOptimization) {
+                        return;
                     }
+                     if (--m_loadedCount == 0)
+                     {
+                         m_isLoaded = false;
+                         lock.unlock();
+
+                         Unloaded();
+                         UnregisterEventHandlers();
+                     }
                 });
         }
 

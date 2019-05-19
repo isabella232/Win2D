@@ -89,6 +89,11 @@ CanvasVirtualControl::CanvasVirtualControl(std::shared_ptr<ICanvasVirtualControl
 {
 }
 
+
+CanvasVirtualControl::~CanvasVirtualControl() {
+    ForceUnloadIfNeeded();
+}
+
 IFACEMETHODIMP CanvasVirtualControl::add_RegionsInvalidated(
     ITypedEventHandler<CanvasVirtualControl*, CanvasRegionsInvalidatedEventArgs*>* value,
     EventRegistrationToken* token)

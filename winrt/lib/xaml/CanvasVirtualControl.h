@@ -56,6 +56,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
         
     public:
         CanvasVirtualControl(std::shared_ptr<ICanvasVirtualControlAdapter> adapter);
+        virtual ~CanvasVirtualControl();
 
         //
         // ICanvasVirtualControl

@@ -7,8 +7,8 @@ IF "%VisualStudioVersion%" LSS "15.0" (
 )
 
 WHERE /Q msbuild >NUL
-IF %ERRORLEVEL% NEQ 0 ( 
-    ECHO Error: It appears that 'msbuild' is not available in this environment. 
+IF %ERRORLEVEL% NEQ 0 (
+    ECHO Error: It appears that 'msbuild' is not available in this environment.
     ECHO.
     GOTO WRONG_COMMAND_PROMPT
 )
@@ -29,7 +29,7 @@ IF %ERRORLEVEL% NEQ 0 (
 
 ECHO.
 
-CALL "%~dp0build\nuget\build-nupkg.cmd" local
+CALL "%~dp0build\nuget\build-nupkg.cmd"
 GOTO END
 
 
